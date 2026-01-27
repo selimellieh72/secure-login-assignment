@@ -1,0 +1,18 @@
+# --- Exclude folders (in any directory) ---
+**/node_modules/
+**/target/
+**/build/
+**/dist/
+**/.mvn/
+**/.gradle/
+
+# --- Exclude Secrets ---
+.env
+.env.local
+*.pem
+*.key
+
+# --- Exclude OS/IDE junk ---
+.DS_Store
+.idea/
+.vscode/
