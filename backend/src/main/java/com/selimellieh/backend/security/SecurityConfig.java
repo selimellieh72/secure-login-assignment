@@ -24,9 +24,9 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Permit all requests to the auth endpoints (login, register, etc.)
-                .requestMatchers("/api/auth/**").permitAll()
-                // All other requests require authentication    
+                // Permit login and refresh endpoints
+                .requestMatchers("/api/auth/login", "/api/auth/refresh").permitAll()
+                // All other requests require authentication
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

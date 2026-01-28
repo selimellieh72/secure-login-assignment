@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
+import java.security.Principal;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +14,7 @@ import com.selimellieh.backend.api.dto.auth.AuthResponse;
 import com.selimellieh.backend.api.dto.auth.LoginRequest;
 import com.selimellieh.backend.api.dto.auth.RefreshRequest;
 import com.selimellieh.backend.api.dto.common.ErrorResponse;
+import com.selimellieh.backend.api.dto.common.SimpleMessageResponse;
 import com.selimellieh.backend.entity.User;
 import com.selimellieh.backend.repository.UserRepository;
 import com.selimellieh.backend.security.JwtUtil;
@@ -21,7 +24,6 @@ import jakarta.validation.Valid;
 /**
  * Minimal auth controller exposing login, refresh, and logout routes.
  *
- * This uses JWTs but does NOT yet wire full Spring Security.
  * The frontend can:
  * - POST /api/auth/login  -> get access + refresh tokens
  * - POST /api/auth/refresh -> get a new access token using a refresh token
@@ -64,6 +66,8 @@ public class AuthController {
         );
     }
 
+    
+
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@Valid @RequestBody RefreshRequest request) {
         String token = request.refreshToken();
@@ -101,6 +105,25 @@ public class AuthController {
                 user.getEmail()
             )
         );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Unauthorized"));
+        }
+
+        User user = userRepository.findByEmail(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("User not found"));
+        }
+
+        user.setRefreshToken(null);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new SimpleMessageResponse("Logged out"));
     }
 
 }
