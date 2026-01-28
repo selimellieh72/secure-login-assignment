@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.selimellieh.backend.api.dto.auth.AuthResponse;
 import com.selimellieh.backend.api.dto.auth.LoginRequest;
 import com.selimellieh.backend.api.dto.auth.RefreshRequest;
+import com.selimellieh.backend.api.dto.auth.RegisterRequest;
 import com.selimellieh.backend.api.dto.common.ErrorResponse;
 import com.selimellieh.backend.api.dto.common.SimpleMessageResponse;
+import com.selimellieh.backend.entity.Role;
 import com.selimellieh.backend.entity.User;
 import com.selimellieh.backend.repository.UserRepository;
 import com.selimellieh.backend.security.JwtUtil;
@@ -27,6 +29,7 @@ import jakarta.validation.Valid;
  * The frontend can:
  * - POST /api/auth/login  -> get access + refresh tokens
  * - POST /api/auth/refresh -> get a new access token using a refresh token
+ * - POST /api/auth/register -> create a user account
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -66,7 +69,33 @@ public class AuthController {
         );
     }
 
-    
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+        User existingUser = userRepository.findByEmail(request.email());
+        if (existingUser != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("Email already registered"));
+        }
+
+        User user = new User(
+            request.email(),
+            passwordEncoder.encode(request.password()),
+            Role.USER
+        );
+
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new AuthResponse(
+                accessToken,
+                refreshToken,
+                user.getEmail()
+            )
+        );
+    }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@Valid @RequestBody RefreshRequest request) {

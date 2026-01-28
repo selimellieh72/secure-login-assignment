@@ -34,6 +34,9 @@ public class AdminUserSeeder {
         if (!StringUtils.hasText(adminEmail) || !StringUtils.hasText(adminPassword)) {
             return;
         }
+        if (userRepository.findByEmail(adminEmail) != null) {
+            return;
+        }
 
         User adminUser = new User(adminEmail, passwordEncoder.encode(adminPassword), Role.ADMIN);
         try {

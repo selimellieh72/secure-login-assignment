@@ -24,8 +24,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Permit login and refresh endpoints
-                .requestMatchers("/api/auth/login", "/api/auth/refresh").permitAll()
+                // Permit login, refresh, and register endpoints
+                .requestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/register").permitAll()
                 // All other requests require authentication
                 .anyRequest().authenticated()
             )
