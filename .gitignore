@@ -13,6 +13,11 @@ Thumbs.db
 # --- Docker ---
 .docker/
 
+# --- Environment files (secrets) ---
+.env
+.env.*
+!.env.example
+
 # --- Subfolder Safety Net (Recursively ignore build junk) ---
 **/node_modules/
 **/target/
