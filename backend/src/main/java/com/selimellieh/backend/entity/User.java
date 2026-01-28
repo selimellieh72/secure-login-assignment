@@ -1,4 +1,4 @@
-package com.selimellieh.backend.user;
+package com.selimellieh.backend.entity;
 
 import jakarta.persistence.*;
 
