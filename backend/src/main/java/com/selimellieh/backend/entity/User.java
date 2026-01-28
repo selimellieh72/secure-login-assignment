@@ -20,6 +20,9 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     protected User() {
         // JPA only
     }
@@ -56,6 +59,14 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
 
