@@ -1,7 +1,10 @@
 import AuthForm from './components/AuthForm';
 import { useEffect } from 'react';
+import Dashboard from './components/Dashboard.tsx';
+import { useAuth } from './context/AuthContext';
 
 function App() {
+  const { isAuthenticated, isLoading } = useAuth();
   
   useEffect(() => {
     document.title = 'Secure Login Portal';
@@ -16,7 +19,13 @@ function App() {
         <p className="text-gray-500 font-medium">Authentication System</p>
       </div>
       
-      <AuthForm />
+      {isLoading ? (
+        <div className="text-gray-500 font-medium">Loading...</div>
+      ) : isAuthenticated ? (
+        <Dashboard />
+      ) : (
+        <AuthForm />
+      )}
       
       <footer className="mt-12 text-gray-400 text-sm">
         &copy; {new Date().getFullYear()} Secure Login System. All rights reserved.
