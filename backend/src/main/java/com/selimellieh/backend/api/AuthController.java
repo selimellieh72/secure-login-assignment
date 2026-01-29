@@ -107,11 +107,6 @@ public class AuthController {
         }
 
         String email = jwtUtil.getEmailFromToken(token);
-        if (!email.equals(request.email())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                // a non-accurate error message to prevent attackers from guessing the email
-                .body(new ErrorResponse("Invalid or expired refresh token"));
-        }
         User user = userRepository.findByEmail(email);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
