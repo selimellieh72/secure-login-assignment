@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -22,11 +24,24 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { login, register: registerUser } = useAuth();
+
+  const getErrorMessage = (error: unknown) => {
+    if (axios.isAxiosError(error)) {
+      const data = error.response?.data as { error?: string; message?: string } | undefined;
+      return data?.error || data?.message || error.message || 'Something went wrong';
+    }
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return 'Something went wrong';
+  };
   
   const {
     register: registerLogin,
     handleSubmit: handleSubmitLogin,
-    formState: { errors: loginErrors },
+    formState: { errors: loginErrors, isSubmitting: isLoginSubmitting },
     reset: resetLogin
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -35,24 +50,36 @@ export default function AuthForm() {
   const {
     register: registerSignup,
     handleSubmit: handleSubmitSignup,
-    formState: { errors: signupErrors },
+    formState: { errors: signupErrors, isSubmitting: isRegisterSubmitting },
     reset: resetSignup
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
-  const onLoginSubmit = (data: LoginFormData) => {
-    console.log('Login data:', data);
-    // TODO: Implement login logic
+  const onLoginSubmit = async (data: LoginFormData) => {
+    setSubmitError(null);
+    try {
+      await login(data);
+      resetLogin();
+    } catch (error) {
+      setSubmitError(getErrorMessage(error));
+    }
   };
 
-  const onRegisterSubmit = (data: RegisterFormData) => {
-    console.log('Register data:', data);
-    // TODO: Implement register logic
+  const onRegisterSubmit = async (data: RegisterFormData) => {
+    setSubmitError(null);
+    try {
+      const { confirmPassword, ...payload } = data;
+      await registerUser(payload);
+      resetSignup();
+    } catch (error) {
+      setSubmitError(getErrorMessage(error));
+    }
   };
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
+    setSubmitError(null);
     resetLogin();
     resetSignup();
   };
@@ -137,11 +164,18 @@ export default function AuthForm() {
               </a>
             </div>
 
+            {submitError && (
+              <p className="text-sm text-red-600">{submitError}</p>
+            )}
+
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-blue-500/30"
+              disabled={isLoginSubmitting}
+              className={`w-full bg-blue-600 text-white py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30 ${
+                isLoginSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-[0.98]'
+              }`}
             >
-              Sign In
+              {isLoginSubmitting ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
         ) : (
@@ -193,11 +227,18 @@ export default function AuthForm() {
               )}
             </div>
 
+            {submitError && (
+              <p className="text-sm text-red-600">{submitError}</p>
+            )}
+
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-blue-500/30"
+              disabled={isRegisterSubmitting}
+              className={`w-full bg-blue-600 text-white py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30 ${
+                isRegisterSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-[0.98]'
+              }`}
             >
-              Create Account
+              {isRegisterSubmitting ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
         )}
