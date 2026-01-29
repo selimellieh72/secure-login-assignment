@@ -19,15 +19,22 @@ function App() {
         <p className="text-gray-500 font-medium">Authentication System</p>
       </div>
       
-      {isLoading ? (
-        <div className="text-gray-500 font-medium">Loading...</div>
-      ) : isAuthenticated ? (
-        <Dashboard />
-      ) : (
-        <AuthForm />
-      )}
+      <main
+        className="w-full flex items-center justify-center"
+        aria-busy={isLoading}
+      >
+        {isLoading ? (
+          <div className="text-gray-500 font-medium" role="status" aria-live="polite">
+            Loading...
+          </div>
+        ) : isAuthenticated ? (
+          <Dashboard />
+        ) : (
+          <AuthForm />
+        )}
+      </main>
       
-      <footer className="mt-12 text-gray-400 text-sm">
+      <footer className="mt-12 text-gray-400 text-sm" role="contentinfo">
         &copy; {new Date().getFullYear()} Secure Login System. All rights reserved.
       </footer>
     </div>

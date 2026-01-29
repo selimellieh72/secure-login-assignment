@@ -13,6 +13,7 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const [isPinging, setIsPinging] = useState(false);
   const logoutTriggeredRef = useRef(false);
+  const extendButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const displayName = user?.email ?? 'Unknown user';
   const role = user?.role ?? 'Unknown role';
@@ -37,6 +38,12 @@ export default function Dashboard() {
     }
   }, [idleMs, logout]);
 
+  useEffect(() => {
+    if (showModal) {
+      extendButtonRef.current?.focus();
+    }
+  }, [showModal]);
+
   const handleExtend = async () => {
     if (isPinging) return;
     setIsPinging(true);
@@ -51,7 +58,12 @@ export default function Dashboard() {
   return (
     <>
       {showWarning && (
-        <div className="w-full max-w-md mb-4 bg-amber-100 border border-amber-300 text-amber-900 px-4 py-3 rounded-lg shadow-sm">
+        <div
+          className="w-full max-w-md mb-4 bg-amber-100 border border-amber-300 text-amber-900 px-4 py-3 rounded-lg shadow-sm"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <div className="flex items-center justify-between text-sm font-semibold">
             <span>Session warning</span>
             <span>{Math.ceil(warningCountdownMs / 1000)}s</span>
@@ -61,9 +73,17 @@ export default function Dashboard() {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Session expiring</h3>
-            <p className="text-sm text-gray-600 mb-4">
+          <div
+            className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="session-expiring-title"
+            aria-describedby="session-expiring-description"
+          >
+            <h3 id="session-expiring-title" className="text-lg font-semibold text-gray-900 mb-2">
+              Session expiring
+            </h3>
+            <p id="session-expiring-description" className="text-sm text-gray-600 mb-4">
               You have been idle. Extend your session to stay signed in.
             </p>
             <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
@@ -76,6 +96,7 @@ export default function Dashboard() {
               type="button"
               onClick={() => void handleExtend()}
               disabled={isPinging}
+              ref={extendButtonRef}
               className={`w-full bg-blue-600 text-white py-3 rounded-lg font-semibold transition-all duration-200 ${
                 isPinging ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-[0.98]'
               }`}
