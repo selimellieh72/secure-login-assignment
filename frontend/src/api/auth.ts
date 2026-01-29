@@ -40,8 +40,12 @@ export const authApi = {
     return response.data;
   },
 
-  // Logout user (optional - if backend has logout endpoint)
+  // Logout user, backend will invalidate the refresh token
   logout: async (): Promise<void> => {
     await axiosInstance.post('/api/auth/logout');
+  },
+
+  ping: async (): Promise<void> => {
+    await axiosInstance.post('/api/auth/ping');
   },
 };
