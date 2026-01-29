@@ -9,9 +9,12 @@ Secure login portal with Spring Boot, React + TypeScript, and Docker. Built for 
 - Protected dashboard UI
 
 ## Instructions
+- Clone the repo using `git clone https://github.com/selimellieh72/secure-login-assignment`
+- Move to the repo's folder using `cd secure-login-assignment`
 - Copy `.env.example` to `.env` and update values if needed
-- Start services: `docker compose up --build`
+- Start docker: `docker compose up --build` (Make sure docker is installed and running)
 - Open the app at `http://localhost:5173`
+
 ## Screenshots
 Login
 ![Login screen](screenshots/login.png)
