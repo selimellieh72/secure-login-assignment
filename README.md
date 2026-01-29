@@ -14,6 +14,7 @@ Secure login portal with Spring Boot, React + TypeScript, and Docker. Built for 
 - Copy `.env.example` to `.env` and update values if needed
 - Start docker: `docker compose up --build` (Make sure docker is installed and running)
 - Open the app at `http://localhost:5173`
+- Run tests to see if the API is working properly using `cd backend; ./mvnw test`
 
 ## Screenshots
 Login
