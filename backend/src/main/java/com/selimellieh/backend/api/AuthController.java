@@ -3,7 +3,10 @@ package com.selimellieh.backend.api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import java.time.Instant;
+import java.util.Map;
 import java.security.Principal;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -148,6 +151,24 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok(new SimpleMessageResponse("Logged out"));
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping() {
+        String dbStatus = "up";
+        try {
+            userRepository.count();
+        } catch (Exception ex) {
+            dbStatus = "down";
+        }
+
+        return ResponseEntity.ok(
+            Map.of(
+                "status", "ok",
+                "checks", Map.of("db", dbStatus),
+                "timestamp", Instant.now().toString()
+            )
+        );
     }
 
 }
