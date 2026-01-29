@@ -46,6 +46,6 @@ export const authApi = {
   },
 
   ping: async (): Promise<void> => {
-    await axiosInstance.post('/api/auth/ping');
+    await axiosInstance.get('/api/auth/ping');
   },
 };
