@@ -154,15 +154,6 @@ export default function AuthForm() {
               )}
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center text-gray-600 cursor-pointer">
-                <input type="checkbox" className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                Remember me
-              </label>
-              <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
-                Forgot password?
-              </a>
-            </div>
 
             {submitError && (
               <p className="text-sm text-red-600">{submitError}</p>
